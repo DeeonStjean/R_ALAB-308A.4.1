@@ -74,20 +74,19 @@ function displayInfo() {
 */
 
 async function initialLoad() {
-    const response = await axios.post("https://api.thecatapi.com/v1/breeds", 
-        requestBody, { 
-        headers: { 
-            'Content-Type': 'application/json; charset=UTF-8' 
-        }   
-        .then(response => {
-            response.data.forEach(element => {
+    axios({
+        method: 'get',
+        url: `https://api.thecatapi.com/v1/breeds`,
+    })
+    .then(response => {
+        response.data.forEach(element => {
             let newOption = document.createElement("option")
             newOption.value = element.id;
             newOption.innerText = element.name
             breedSelect.appendChild(newOption)
-            });
-        }) 
-    })
+        });
+     })
+    
 }
 initialLoad();
 
@@ -100,6 +99,46 @@ As an added challenge, try to do this on your own without referencing the lesson
 axios.interceptors.request.use(request => {
     request.metadata = request.metadata || {};
     request.metadata.startTime = new Date().getTime();
-    console.log("request begin now")
+    console.log("request begin now");
+    progressBar.style.width="0%";
+    document.querySelector('body').style.cursor = "progress";
     return request;
 });
+/*6
+-Create a progress bar to indicate the request is in progress.
+-The progressBar element has already been created for you.
+-You need only to modify its width style property to align with the request progress.
+-In your request interceptor, set the width of the progressBar element to 0%.
+-This is to reset the progress with each request.
+-Research the axios onDownloadProgress config option.
+-Create a function "updateProgress" that receives a ProgressEvent object.
+-Pass this function to the axios onDownloadProgress config option in your event handler.
+-console.log your ProgressEvent object within updateProgress, and familiarize yourself with its structure.
+-Update the progress of the request using the properties you are given.
+-Note that we are not downloading a lot of data, so onDownloadProgress will likely only fire once or twice per request to this API. 
+-This is still a concept worth familiarizing yourself with for future projects.*/
+
+function updateProgress(progressEvent) {
+    let percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+    progressBar.style.width = `${percentCompleted}%`;
+}
+
+/*7
+ As a final element of progress indication, add the following to your axios interceptors:
+ -In your request interceptor, set the body element's cursor style to "progress."
+ -In your response interceptor, remove the progress cursor style from the body element.
+ line 104 is part 7
+ */
+
+/*8
+-To practice posting data, we will create a system to "favourite" certain images.
+-The skeleton of this favourite() function has already been created for you.
+-This function is used within Carousel.js to add the event listener as items are created.
+-This is why we use the export keyword for this function.
+-Post to the cat API's favourites endpoint with the given id.
+-The API documentation gives examples of this functionality using fetch(); use Axios!
+-Add additional logic to this function such that if the image is already favourited, you delete that favourite using the API, giving this function "toggle" behavior.
+-You can call this function by clicking on the heart at the top right of any image.*/
+export function favourite(){
+    
+}
