@@ -76,6 +76,7 @@ function displayInfo() {
 async function initialLoad() {
     axios({
         method: 'get',
+        onDownloadProgress: (progressEvent) => updateProgress(progressEvent),
         url: `https://api.thecatapi.com/v1/breeds`,
     })
     .then(response => {
@@ -85,7 +86,7 @@ async function initialLoad() {
             newOption.innerText = element.name
             breedSelect.appendChild(newOption)
         });
-     })
+    })
     
 }
 initialLoad();
@@ -139,6 +140,41 @@ function updateProgress(progressEvent) {
 -The API documentation gives examples of this functionality using fetch(); use Axios!
 -Add additional logic to this function such that if the image is already favourited, you delete that favourite using the API, giving this function "toggle" behavior.
 -You can call this function by clicking on the heart at the top right of any image.*/
-export function favourite(){
-    
+export async function favourite(favId){
+   try {
+    const favouriteCats = await axios.get('https://api.thecatapi.com/v1/favourites', {
+        headers: {
+          'x-api-key': API_KEY,
+        },
+    });   
+    const favourites = favouriteCats.data;
+    const alreadyFavourites = favourites.find(fav => fav.image_id === favId); 
+    if (alreadyFavourites) {
+        await axios.delete(`https://api.thecatapi.com/v1/favourites/${alreadyFavourites.id}`, {
+            headers: {
+              'x-api-key': API_KEY,
+            },
+          });
+    }else {
+        const response = await axios.post(`https://api.thecatapi.com/v1/favourites`, {
+            image_id: favId
+        },
+        { 
+            headers: {
+                'x-api-key': API_KEY,
+            },
+        })
+        console.log(response.data);
+    }
+   } catch (error) {
+    console.log(error);
+   }
 }
+/*9
+-Test your favourite() function by creating a getFavourites() function.
+-Use Axios to get all of your favourites from the cat API.
+-Clear the carousel and display your favourites when the button is clicked.
+-You will have to bind this event listener to getFavouritesBtn yourself.
+-Hint: you already have all of the logic built for building a carousel. 
+-If that is not in its own function, maybe it should be so that you do not have to repeat yourself in this section.
+*/
